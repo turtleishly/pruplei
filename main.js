@@ -1,48 +1,82 @@
+ 
  var game = new Phaser.Game(640,360,Phaser.AUTO);
 
  var GameState = {
      preload : function(){
+        //loading sprites into code
         this.load.image('background','background.png')
         this.load.image('chicken','chicken.png')
         this.load.image('horse','horse.png')
         this.load.image('pig','pig.png')       
         this.load.image('sheep','sheep.png')   
+        this.load.image('arrow','arrow.png')
 
 
 
      },
      create: function(){
+        //background
         this.background = this.game.add.sprite(0,0,'background');
 
+        // screen scaling
         this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL
         this.scale.pageAlignHorizontally = true;
         this.scale.pageAlignVertically = true;
 
+        var animalData = [
+         {key : 'chicken',text: 'CHICKEN'},
+         {key: 'horse',text:'HORSE'},
+         {key: 'pig',text: 'PIG '},
+         {key: 'sheep',text: 'SHEEP '},
+        ];
+
+        this.animals = this.game.add.group();
+
+        var self = this;
+        animalData.forEach(function(element){
+           self.animals.create(200,self.game.centerY,element.key)
+
+
+        });
+         
+         //this.(animal).events.onInputDown.add(this.animateAnimal,this)
+
+         //left arrow
+         this.leftarrow = this.game.add.sprite(50,this.game.world.centerY,'arrow')
+         this.leftarrow.anchor.setTo(0.5)
+         this.leftarrow.scale.setTo(-1,1)
+         this.leftarrow.customParams = {direction: -1};
+
+         //left arrow user input
+         this.leftarrow.inputEnabled = true;
+         this.leftarrow.input.pixelPerfectClick = true;
+         this. leftarrow.events.onInputDown.add(this.switchAnimal,this)
+
+         //right arrow
+         this.rightarrow = this.game.add.sprite(580,this.game.world.centerY,'arrow')
+         this.rightarrow.anchor.setTo(0.5)
+         this.rightarrow.scale.setTo(1,1)
+         this.rightarrow.customParams = {direction: 1};
+
+         //right arrow use input
+         this.rightarrow.inputEnabled = true;
+         this.rightarrow.input.pixelPerfectClick = true;
+         this. rightarrow.events.onInputDown.add(this.switchAnimal,this)
         
-       
-        
-
-        this.chicken = this.game.add.sprite(this.game.world.centerX,this.game.world.centerY,'chicken')
-         this.chicken.anchor.setTo(0.5);
-         this.chicken.scale.setTo(1.5,1.5)
-
-         this.pig = this.game.add.sprite(500,300,'pig')
-         this.pig.anchor.setTo(0.5)
-         this.pig.scale.setTo(-0.5,0.5)
-
-         this.horse = this.game.add.sprite(50,50,'horse')
-         this.horse.anchor.setTo(0.5)
-         this.horse.scale.setTo(0.5)
-
-         this.sheep = this.game.add.sprite(50,300,'sheep')
-         this.sheep.anchor.setTo(0.5)
-         this.sheep.scale.setTo(0.5)
-         this.sheep.angle = 0;
      },
+     // updates game a few times per second
      update: function(){
-        this.sheep.angle += 10
+        
+        },
+        //a method we use in the code
+      switchAnimal: function(sprite,event) {
+      console.log('move animal')
 
-     }
+     },
+     // same thing
+     animateAnimal: function(sprite,event) {
+   console.log('animate animal')
+     },
  };
 
  game.state.add('GameState',GameState);
