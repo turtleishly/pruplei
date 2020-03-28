@@ -33,11 +33,20 @@
         this.animals = this.game.add.group();
 
         var self = this;
+        var animal;
         animalData.forEach(function(element){
-           self.animals.create(200,self.game.centerY,element.key)
+           animal = self.animals.create(self.game.world.centerX+1000,self.game.world.centerY,element.key)
 
+           animalData.customParams = {text:element.text}
+           animal.anchor.setTo(0.5);
 
+           animal.inputEnabled = true;
+           animal.input.pixelPerfectClick = true;
+           animal.events.onInputDown.add(self.animateAnimal,self)
         });
+
+        this.currentAnimal = this.animals.previous();
+        this.currentAnimal.position.set(this.game.world.centerX,this.game.world.centerY)
          
          //this.(animal).events.onInputDown.add(this.animateAnimal,this)
 
@@ -58,7 +67,7 @@
          this.rightarrow.scale.setTo(1,1)
          this.rightarrow.customParams = {direction: 1};
 
-         //right arrow use input
+         //right arrow user input
          this.rightarrow.inputEnabled = true;
          this.rightarrow.input.pixelPerfectClick = true;
          this. rightarrow.events.onInputDown.add(this.switchAnimal,this)
@@ -68,15 +77,32 @@
      update: function(){
         
         },
+
+        // same thing
+     animateAnimal: function(sprite,event) {
+      console.log('animate animal')
+        },
+
         //a method we use in the code
       switchAnimal: function(sprite,event) {
-      console.log('move animal')
+      var newAnimal,endX;
 
+      if(sprite.customParams.direction > 0) {
+         newAnimal = this.animals.next();
+         endX = 640 + this.currentAnimal.width/2;
+      }
+      else{
+         newAnimal = this.animals.previous();
+         endX = -this.currentAnimal.width/2;
+      }
+      this.currentAnimal.x = endX
+
+      newAnimal.x = this.game.world.centerX;
+      this.currentAnimal = newAnimal;
      },
-     // same thing
-     animateAnimal: function(sprite,event) {
-   console.log('animate animal')
-     },
+
+
+     
  };
 
  game.state.add('GameState',GameState);
