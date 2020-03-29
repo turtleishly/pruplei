@@ -5,12 +5,17 @@
      preload : function(){
         //loading sprites into code
         this.load.image('background','background.png')
-        this.load.image('chicken','chicken.png')
-        this.load.image('horse','horse.png')
-        this.load.image('pig','pig.png')       
-        this.load.image('sheep','sheep.png')   
         this.load.image('arrow','arrow.png')
 
+        //this.load.image('chicken','chicken.png')
+        //this.load.image('horse','horse.png')
+        //this.load.image('pig','pig.png')       
+        //this.load.image('sheep','sheep.png') 
+        
+        this.load.spritesheet('chicken','chicken_spritesheet.png',131 ,200 ,3);
+        this.load.spritesheet('horse','horse_spritesheet.png',212 ,200 ,3);
+        this.load.spritesheet('pig','pig_spritesheet.png',297 ,200 ,3);
+        this.load.spritesheet('sheep','sheep_spritesheet.png',244 , 200,3);
 
 
      },
@@ -35,10 +40,12 @@
         var self = this;
         var animal;
         animalData.forEach(function(element){
-           animal = self.animals.create(self.game.world.centerX+1000,self.game.world.centerY,element.key)
+           animal = self.animals.create(-1000,self.game.world.centerY,element.key,0)
 
            animalData.customParams = {text:element.text}
            animal.anchor.setTo(0.5);
+
+           animal.animations.add('animate',[0,1,2,1,0],3 , false);
 
            animal.inputEnabled = true;
            animal.input.pixelPerfectClick = true;
@@ -80,25 +87,47 @@
 
         // same thing
      animateAnimal: function(sprite,event) {
-      console.log('animate animal')
-        },
+      sprite.play('animate')
+   },
 
         //a method we use in the code
       switchAnimal: function(sprite,event) {
       var newAnimal,endX;
 
+         if (this.isMoving) {
+            return false;
+         }
+
+         this.isMoving = true;
+
       if(sprite.customParams.direction > 0) {
          newAnimal = this.animals.next();
+         newAnimal.x = -newAnimal.width/2
          endX = 640 + this.currentAnimal.width/2;
       }
       else{
          newAnimal = this.animals.previous();
          endX = -this.currentAnimal.width/2;
+         newAnimal.x = newAnimal.width/2 + 640;
+
       }
+         var newAnimalMovement = this.game.add.tween(newAnimal);
+         newAnimalMovement.to({x: this.game.world.centerX},1000);
+         newAnimalMovement.onComplete.add(function(){
+            this.isMoving = false;
+         },this);
+         newAnimalMovement.start();
+
+
+         var currentAnimalMovement = this.game.add.tween(this.currentAnimal);
+         currentAnimalMovement.to({x:endX},1000);
+         currentAnimalMovement.start();
+
+
       this.currentAnimal.x = endX
 
-      newAnimal.x = this.game.world.centerX;
       this.currentAnimal = newAnimal;
+
      },
 
 
