@@ -17,6 +17,12 @@
         this.load.spritesheet('pig','pig_spritesheet.png',297 ,200 ,3);
         this.load.spritesheet('sheep','sheep_spritesheet.png',244 , 200,3);
 
+        this.load.audio('chickenSound',['chicken.mp3','chicken.ogg']);
+        this.load.audio('horseSound',['horse.mp3','horse.ogg']);
+        this.load.audio('pigSound',['pig.mp3','pig.ogg']);
+        this.load.audio('sheepSound',['sheep.mp3','sheep.ogg']);
+
+
 
      },
      create: function(){
@@ -29,10 +35,10 @@
         this.scale.pageAlignVertically = true;
 
         var animalData = [
-         {key : 'chicken',text: 'CHICKEN'},
-         {key: 'horse',text:'HORSE'},
-         {key: 'pig',text: 'PIG '},
-         {key: 'sheep',text: 'SHEEP '},
+         {key : 'chicken',text: 'CHICKEN',audio :'chickenSound'},
+         {key: 'horse',text:'HORSE',audio :'horseSound'},
+         {key: 'pig',text: 'PIG ',audio :'pigSound'},
+         {key: 'sheep',text: 'SHEEP ',audio :'sheepSound'},
         ];
 
         this.animals = this.game.add.group();
@@ -42,7 +48,7 @@
         animalData.forEach(function(element){
            animal = self.animals.create(-1000,self.game.world.centerY,element.key,0)
 
-           animalData.customParams = {text:element.text}
+           animal.customParams = {text:element.key,sound : self.game.add.audio(element.audio)}
            animal.anchor.setTo(0.5);
 
            animal.animations.add('animate',[0,1,2,1,0],3 , false);
@@ -53,7 +59,9 @@
         });
 
         this.currentAnimal = this.animals.previous();
-        this.currentAnimal.position.set(this.game.world.centerX,this.game.world.centerY)
+        this.currentAnimal.position.set(this.game.world.centerX,this.game.world.centerY);
+
+        this.showText(this.currentAnimal);
          
          //this.(animal).events.onInputDown.add(this.animateAnimal,this)
 
@@ -88,17 +96,20 @@
         // same thing
      animateAnimal: function(sprite,event) {
       sprite.play('animate')
+      sprite.customParams.sound.play();
    },
 
         //a method we use in the code
       switchAnimal: function(sprite,event) {
       var newAnimal,endX;
 
+
          if (this.isMoving) {
             return false;
          }
 
          this.isMoving = true;
+         this.animalText.visible = false;
 
       if(sprite.customParams.direction > 0) {
          newAnimal = this.animals.next();
@@ -112,24 +123,40 @@
 
       }
          var newAnimalMovement = this.game.add.tween(newAnimal);
-         newAnimalMovement.to({x: this.game.world.centerX},1000);
+         newAnimalMovement.to({x: this.game.world.centerX},500);
          newAnimalMovement.onComplete.add(function(){
             this.isMoving = false;
+            this.showText(newAnimal);
          },this);
          newAnimalMovement.start();
 
 
          var currentAnimalMovement = this.game.add.tween(this.currentAnimal);
-         currentAnimalMovement.to({x:endX},1000);
+         currentAnimalMovement.to({x:endX},500);
          currentAnimalMovement.start();
 
 
       this.currentAnimal.x = endX
 
       this.currentAnimal = newAnimal;
-
      },
 
+     showText: function(animal){
+        if(!this.animalText) {
+
+         var style = {
+            font:'bold 30pt Arial',
+            fill: '#D0171B',
+            align:'center'
+         }
+           this.animalText = this.game.add.text(this.game.width/2,this.game.height * 0.85,'',style)
+           this.animalText.anchor.setTo(0.5);
+
+        }
+        this.animalText.setText(animal.customParams.text);
+      this.animalText.visible = true;
+
+     }
 
      
  };
